@@ -1,0 +1,7 @@
+extend layout
+block content
+    each item,i in names
+     a(href='/image/?img='+item+'&folder='+ dir[i]+'&tag='+linkTag) 
+      div#droppable.imagesRows
+       img(src=item)  
+block sidebar

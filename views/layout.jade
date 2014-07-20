@@ -1,0 +1,81 @@
+
+doctype html
+html
+  if (!linkTag)
+   - linkTag=0
+  head
+    title #{title} - Gallery
+    link(rel="stylesheet", href="/public/stylesheets/style.css")
+    link(href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css", rel="stylesheet")
+    link(rel="stylesheet" href="//code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css")
+    script(type="text/javascript", src="/public/js/jquery-1.10.2.min.js")
+    script(src="//code.jquery.com/ui/1.11.0/jquery-ui.js")
+    script.
+     $(function() {
+      $('.headertag').attr('id', function(i) {
+       return 'draggable'+(i+1);
+      });
+      $('.imagesRows').attr('id', function(i) {
+       return 'droppable'+(i+1);
+      });
+      $('.headertagbold').attr('id', function(i) {
+       return 'droppabletag'+(i+1);
+      });
+      $('.headertag').each(function(i) {
+       $("#draggable"+(i+1)).draggable({ revert: true });
+      });
+      $('.imagesRows').each(function(i) {
+       $("#droppable"+(i+1)).droppable({
+        hoverClass:"droppMark",
+        accept:".headertag",
+        drop: function( event, ui ) {
+         var imgsrc=$(this).children('img').attr('src')
+         var n=imgsrc.indexOf("/thumbs/")
+         var dropfolder=imgsrc.substring(8,n)
+         var dropimage=imgsrc.substring(n)
+         window.location.href="/drop?tag="+ui.draggable.text()+"&folder="+dropfolder+"&image="+i
+        }
+       });
+      });
+     });
+  body
+    .header
+     .main-header
+      each direct,i in folders
+        if (direct===selFolder)
+          a.headerfolderbold(href="/?folder="+i) #{direct}
+        else 
+          a.headerfolder(href="/?folder="+i) #{direct}
+      p
+       h1 Gallery
+      each tag in tags
+       - var imagetag
+       - var btag=0
+       each stag in selTags
+        if (tag.tagsname===stag.tagssel)
+         - if(imagebool){imagetag="<a href='/image/?img="+item+"&folder="+ foldernr+"&tag="+linkTag+"&del="+tag.tagsname+"'><i class='fa fa-times'></i></a>"}else{imagetag=''}
+         - btag=1
+         - break
+        else
+         - btag=0
+       if (btag===1)
+        a(href="/?tag="+linkTag+"&sub="+tag.tagsname) 
+         div#droppable.headertagbold
+          !{tag.tagsname}
+          !{imagetag}
+       else
+        a(href="/?tag="+linkTag+"&add="+tag.tagsname) 
+         div#draggable.headertag
+          !{tag.tagsname}
+      form(action="/newtag", method="post")
+       input#tag.newheadertag(name="sendtag", type="text", placeholder="new tag")
+       input(type="submit", style="display:none")
+      i.fa.fa-trash-o 
+      div.trashtext delete tags
+    .container
+      .main-content
+        block content
+      .sidebar
+        block sidebar
+    footer
+      p Running on node with Express, Jade and Stylus
