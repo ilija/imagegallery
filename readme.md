@@ -1,0 +1,1 @@
+This Imagegallery is working with Node, Express and Jade. Organize your images in the /image folder (see example) in folders and the thumbs in a thumbs-folder. The Imagegallery will read your image folders and display them. You can tag your images by multiple draggable/droppable tags (it is using Jquery UI). Can be installed on Raspberry PI or similar.
