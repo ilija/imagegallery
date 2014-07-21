@@ -6,7 +6,8 @@ var express = require('express')
   , nib = require('nib')
 
 var fs = require('fs'),
-    path = require('path')
+    path = require('path'),
+    gm = require('gm').subClass({ imageMagick: true })
 
 var app = express()
 function compile(str, path) {
@@ -126,6 +127,7 @@ app.get('/', function (req, res) {
   });
 })
 app.get('/image', function (req, res) {
+  var mirror = req.query.mirror
   var folder = req.query.folder
   var imageold = req.query.img
   var n=imageold.indexOf("/thumbs/")
@@ -195,6 +197,17 @@ app.get('/image', function (req, res) {
   if (!folder || folder==''){folder=0}
   var directories=getDirs('./images')
   var selDirectory=directories[folder]
+  if(mirror){
+   console.log("mirror NOW")
+   var writeimage="/images/"+selDirectory+"/"+image
+   gm(writeimage).flop().write("/images/"+selDirectory+"/flop.jpg", function (err) {
+    if (!err) {console.log('done1')}else{console.log(err)};
+   })
+   var writethumb="/images/"+selDirectory+"/thumbs/"+image
+   gm(writethumb).flop().write(writethumb, function (err) {
+    if (!err) {console.log('done2')}else{console.log('error2: '+"/images/"+selDirectory+"/thumbs/"+image)};
+   })
+  }
   res.render('image',
   { title : 'image', name : image, dir : folder, folders : directories, selFolder : selDirectory, tags:tagsjade, selTags:selTagsjade, linkTag:tag, imagebool:1, item:imageold, foldernr:folder}
   )

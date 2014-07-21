@@ -72,6 +72,10 @@ html
        input(type="submit", style="display:none")
       i.fa.fa-trash-o 
       div.trashtext delete tags
+      if (imagebool)
+       a(href="/image/?img="+item+"&folder="+foldernr+"&tag="+linkTag+"&mirror=1") 
+        i.fa.fa-exchange 
+        div.trashtext mirror image
     .container
       .main-content
         block content
