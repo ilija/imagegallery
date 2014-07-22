@@ -46,7 +46,7 @@ body {
   margin-left: 20px;
 }
 
-.fa-trash-o.fa-exchange.fa-chevron-left.fa-chevron-right{
+.fa-trash-o, .fa-exchange, .fa-chevron-left, .fa-chevron-right{
 	float: left;
 	margin-left: 30px;
 	color:white;
