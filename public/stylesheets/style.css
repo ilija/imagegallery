@@ -1,13 +1,13 @@
 @import url('http://fonts.googleapis.com/css?family=Quicksand');
 
 body {
-    background-color:#faf9f0;
+    background-color:#faf9ef;
 }
 
 .header{
   width:100%;
   height:120px;
-  background-color:#fa5b4d;
+  background-color:#b69dad;
   font-family: 'Quicksand','arial';
   color: #fa5b4d;
   font-size: 25px;
