@@ -37,6 +37,19 @@ function getDirs(rootDir){
      return fs.statSync(rootDir+'/'+file).isDirectory();
   });
 }
+
+//No Cashing of Pages in Safari -> preventing white page
+app.all('*', function(req, res, next) {
+  var agent;
+  agent = req.headers['user-agent'];
+  if (agent.indexOf('Safari') > -1 && agent.indexOf('Chrome') === -1 && agent.indexOf('OPR') === -1) {
+    res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.header('Pragma', 'no-cache');
+    res.header('Expires', 0);
+  }
+  return next();
+});
+
 app.configure(function() {
   app.use(express.bodyParser());
 })
@@ -72,6 +85,7 @@ app.get('/', function (req, res) {
     tag=tag+','+req.query.add
    }
    var tagArrayNew=tag.split(',')
+   var shouldfind=tagArrayNew.length-1
   readJSONFile("./public/tags.json", function (err, json) {
     if(err) { throw err; }
     var tagsjade = []
@@ -84,26 +98,50 @@ app.get('/', function (req, res) {
      var folderTemp=[]
      var files=[]
      var directories=getDirs('./images')
+     var selDirectory,selfiles,pushfile,pushfolder, pushImage
+     var found=0
+     console.log("shouldfind: "+shouldfind)
      var processFiles = function(callback){
        json.tags.forEach(function processF(getAllTags){
+        console.log("tag in json: "+getAllTags.name)
         tagArrayNew.forEach(function processT(getAllT){
-         console.log("getAllT: "+getAllT)
-         console.log("getAllTags.name: "+getAllTags.name)
+         console.log("searched Tag: "+getAllT)
          if (getAllT==getAllTags.name){
 	      getAllTags.members.forEach(function getFiles(memberTag){
-		 	var selDirectory=directories[memberTag.folder]
-		 	var selfiles=fs.readdirSync('./images/'+selDirectory+'/thumbs/').filter(function(v){return v[0]!='.'})
-	     	var pushfile='/images/'+selDirectory+'/thumbs/'+selfiles[memberTag.image]
-		    files.push(pushfile)
-		    folderTemp.push(memberTag.folder)
+	      	if (found==0){
+		 		selDirectory=directories[memberTag.folder]
+		 		pushImage=memberTag.image
+		 		selfiles=fs.readdirSync('./images/'+selDirectory+'/thumbs/').filter(function(v){return v[0]!='.'})
+		 		pushfile='/images/'+selDirectory+'/thumbs/'+selfiles[memberTag.image]
+		 		pushfolder=memberTag.folder
+		 		found=found+1
+		 		console.log("found: "+found)
+		 	}else{
+			 	if(memberTag.folder==pushfolder && memberTag.image==pushImage){
+				 	selDirectory=directories[memberTag.folder]
+				 	pushImage=memberTag.image
+				 	selfiles=fs.readdirSync('./images/'+selDirectory+'/thumbs/').filter(function(v){return v[0]!='.'})
+				 	pushfile='/images/'+selDirectory+'/thumbs/'+selfiles[memberTag.image]
+				 	pushfolder=memberTag.folder
+		 			found=found+1
+		 			console.log("found: "+found)
+			 	}
+		 	}
 	      })
 	     }
-	    }) 
+	    })
 	   })
-	   console.log("files: "+files)
-	   res.render('index',
+	   if (found==shouldfind){
+	    	files.push(pushfile)
+			folderTemp.push(pushfolder)
+			console.log("files: "+files)
+			res.render('index',
       	{ title : 'Home', names : files, dir : folderTemp, folders : directories, selFolder : selDirectory, tags:tagsjade, selTags:selTagsjade, linkTag:tag}
-      )
+	  		)
+		}else{
+			console.log("not found tag:"+tag)
+			res.render('empty', { title : 'Home', names : files, folders : directories, tags:tagsjade, selTags:selTagsjade, linkTag:tag})
+		}
 	   callback()
      }
      processFiles(function(err,fileName){
@@ -111,6 +149,7 @@ app.get('/', function (req, res) {
      })    
     }
     else{
+    console.log("getFOLDERS: ")
     var folderTemp=[]
      var directories=getDirs('./images')
      var selDirectory=directories[folder]

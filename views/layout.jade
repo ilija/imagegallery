@@ -60,17 +60,17 @@ html
        if (btag===1)
         a(href="/?tag="+linkTag+"&sub="+tag.tagsname) 
          div#droppable.headertagbold
-          !{tag.tagsname}
-          !{imagetag}
+          != tag.tagsname
+          != imagetag
        else
         a(href="/?tag="+linkTag+"&add="+tag.tagsname) 
          div#draggable.headertag
-          !{tag.tagsname}
+          != tag.tagsname
       form(action="/newtag", method="post")
        input#tag.newheadertag(name="sendtag", type="text", placeholder="new tag")
        input(type="submit", style="display:none")
       i.fa.fa-trash-o 
-      div.trashtext delete tags
+      div.trashtext delete tag
       if (imagebool)
        a(href="/image/?img="+item+"&folder="+foldernr+"&tag="+linkTag+"&mirror=1") 
         i.fa.fa-exchange 
