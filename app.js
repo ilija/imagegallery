@@ -10,6 +10,9 @@ var fs = require('fs'),
     gm = require('gm').subClass({ imageMagick: true })
 
 var app = express()
+app.configure(function() {
+  app.use(express.bodyParser());
+})
 function compile(str, path) {
   return stylus(str)
     .set('filename', path)
@@ -50,9 +53,6 @@ app.all('*', function(req, res, next) {
   return next();
 });
 
-app.configure(function() {
-  app.use(express.bodyParser());
-})
 app.set('views', __dirname + '/views')
 app.set('view engine', 'jade')
 app.use(express.logger('dev'))
