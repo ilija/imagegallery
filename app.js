@@ -297,9 +297,10 @@ app.post('/newtag', function (req,res){
 					console.log("The file was saved!");
 				}
 			}); 
-			if (tag==0){res.redirect('/?folder='+folder)}
-			else{res.redirect('/?tag='+tag)}
+			if (folder){res.redirect('/'+folder)}
+			else if(tag){res.redirect('/?tag='+tag)}
+			else{res.redirect('/')}
 		})
 	}		
 })
-app.listen(80)
+app.listen(3000)
